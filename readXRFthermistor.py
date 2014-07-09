@@ -1,0 +1,49 @@
+#!/usr/bin/python
+
+import serial
+import datetime
+import time
+
+devid = 'TA'
+baud = 9600
+port = "/dev/ttyACM0"
+outfile = "thermistor.log"
+
+ser = serial.Serial(port, baud)
+ser.timeout = 0
+
+# just copy paste from here to screen /dev/ttyACM0 9600 
+# or ttyAMA0 on raspberry
+
+COMMANDS = """
+aTAINTVL005M
+aTACYCLE----
+"""
+
+def parseLLMPTemp(msg):
+	if not msg[0] == 'a':
+		raise Exception("Not a LLMP message: %s" % msg)
+
+	deviceName = msg[1:3]
+	if msg[3:7] == 'TMPA':
+		temperature = float(msg[7:])
+	else:
+		raise Exception("Unable to parse %s" % msg)	
+
+	return (deviceName, temperature)
+
+while True:
+	if ser.inWaiting() >= 12:
+		now = datetime.datetime.now()
+		msg = ser.readline()
+		deviceName = None
+		temperature = None
+		try:
+			[deviceName, temperature] = parseLLMPTemp(msg)
+			logline = "%s %s %.3f" % (now, deviceName, temperature)
+		except Exception as e:
+			logline = "%s %s" (now, e)
+		open(outfile, "a").write(logline + "\n")
+		print logline	
+
+	time.sleep(1)	

@@ -6,7 +6,8 @@ import httplib
 
 
 def thingspeak_write(api_key, fields):
-	# write to thingspeak channel and return entry id (?)
+	# write to thingspeak channel and return entry id on succesful update,
+	# raise exception on failed update
 	
 
 	fieldDict = {}
@@ -15,7 +16,7 @@ def thingspeak_write(api_key, fields):
 	
 	fieldDict["key"] = api_key
 
-	#params = urllib.urlencode({'field1': str(field1), 'field2': str(field2), "key":api_key})
+	
 	params = urllib.urlencode(fieldDict)
 
 
@@ -36,7 +37,10 @@ def thingspeak_write(api_key, fields):
 
 if __name__ == "__main__":
 	import datetime
-	api_key = open("api_key.txt").read().strip()
+	try:
+		api_key = open("api_key.txt").read().strip()
+	except:
+		raise Exception("API key for testing should be in api_key.txt")
 
 	now = datetime.datetime.now()
 

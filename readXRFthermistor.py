@@ -3,6 +3,7 @@
 import serial
 import datetime
 import time
+import thingspeak
 
 devid = 'TA'
 baud = 9600
@@ -32,6 +33,9 @@ def parseLLAPTemp(msg):
 
 	return (deviceName, temperature)
 
+
+api_key = open("api_key.txt").read().strip()
+
 while True:
 	if ser.inWaiting() >= 12:
 		now = datetime.datetime.now()
@@ -41,6 +45,10 @@ while True:
 		try:
 			[deviceName, temperature] = parseLLAPTemp(msg)
 			logline = "%s %s %.3f" % (now, deviceName, temperature)
+			fields = []
+			if deviceName == "TA":
+				fields[0] = temperature
+			thingspeak.thingspeak.write(api_key, fields)
 		except Exception as e:
 			logline = "%s %s" (now, e)
 		open(outfile, "a").write(logline + "\n")

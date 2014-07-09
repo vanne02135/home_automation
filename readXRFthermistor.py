@@ -20,9 +20,9 @@ aTAINTVL005M
 aTACYCLE----
 """
 
-def parseLLMPTemp(msg):
+def parseLLAPTemp(msg):
 	if not msg[0] == 'a':
-		raise Exception("Not a LLMP message: %s" % msg)
+		raise Exception("Not a LLAP message: %s" % msg)
 
 	deviceName = msg[1:3]
 	if msg[3:7] == 'TMPA':
@@ -39,7 +39,7 @@ while True:
 		deviceName = None
 		temperature = None
 		try:
-			[deviceName, temperature] = parseLLMPTemp(msg)
+			[deviceName, temperature] = parseLLAPTemp(msg)
 			logline = "%s %s %.3f" % (now, deviceName, temperature)
 		except Exception as e:
 			logline = "%s %s" (now, e)

@@ -50,7 +50,7 @@ while True:
 				fields[0] = temperature
 			thingspeak.thingspeak.write(api_key, fields)
 		except Exception as e:
-			logline = "%s %s" (now, e)
+			logline = "%s %s" % (now, e)
 		open(outfile, "a").write(logline + "\n")
 		print logline	
 

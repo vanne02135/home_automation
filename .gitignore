@@ -4,3 +4,5 @@ api_key.txt
 *.pyc
 
 test_key.txt
+
+fmi_api_key.txt

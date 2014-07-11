@@ -3,6 +3,7 @@
 
 import subprocess
 import time
+import datetime
 from thingspeak import thingspeak_write
 
 def parseSensors(sensors_stdout):
@@ -46,10 +47,12 @@ if __name__ == "__main__":
 		temps = TempsAndFan()
 		loadavgs =  uptime()
 		data = [temps["CPUTIN"], temps["core0"], temps["core1"], temps["fan2"], loadavgs[0], loadavgs[1], loadavgs[2]]
-		entry_id = thingspeak_write(api_key, data)
-		print "%d linux sensor entries" % entry_id
+		now = datetime.datetime.now()
+		try:
+			entry_id = thingspeak_write(api_key, data)
+			print "%s %d linux sensor entries" % (now, entry_id)
+		except Exception as e:
+			print "%s %s" % (now, e)
 		time.sleep(20)
 
-
-			
 

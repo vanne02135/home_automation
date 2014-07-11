@@ -41,32 +41,43 @@ def parseLLAP(msg):
 
 	return (deviceName, temperature, battery)
 
+def chunks(mystr, n):
+        # yield n sized chunks from myst
+        for k in xrange(0, len(mystr), n):
+                yield mystr[k:k+n]
+
+
 if __name__ == "__main__":
 
 	api_key = open("api_key.txt").read().strip()
+	api_key_battery = open("api_key_battery.txt").read().strip()
 
 	while True:
 		if ser.inWaiting() >= 12:
 			# TODO split concatenated messages here. Temp & Battery value
-			# should be posted in one call to thingspeak (15s min update interval)
+			# should be posted in one call to thingspeak (15s min update intervals)
 			now = datetime.datetime.now()
-			msg = ser.readline()
-			print "%s inbound message: %s" % (now, msg)
-			deviceName = None
-			temperature = None
-			try:
-				[deviceName, temperature, battery] = parseLLAP(msg)
-				logline = "%s %s %.3f %s" % (now, deviceName, temperature, battery)
-				# battery value not yet xferd to thingspeak
-				fields = [0]
-				if deviceName == "TA":
-					fields[0] = temperature
-				thingspeak.thingspeak_write(api_key, fields)
-			except Exception as e:
-				logline = "%s %s" % (now, e)
-			open(outfile, "a").write(logline + "\n")
-			print logline	
+			msgs = ser.readline()
+			for msg in chunks(msgs, 12):
+				print "%s inbound message: %s" % (now, msg)
+				deviceName = None
+				temperature = None
+				try:
+					[deviceName, temperature, battery] = parseLLAP(msg)
+					fields = [0]
+					if deviceName == "TA" and temperature:
+						fields[0] = temperature
+						logline = "%s %s %.3f" % (now, deviceName, temperature)
+						thingspeak.thingspeak_write(api_key, fields)
+					if deviceName == "TA" and battery:
+						fields[0] = battery
+						logline = "%s %s %.3f" % (now, deviceName, battery)
+						thingspeak.thingspeak_write(api_key_battery, fields)
+				except Exception as e:
+					logline = "%s %s" % (now, e)
+				open(outfile, "a").write(logline + "\n")
+				print logline	
 
-		time.sleep(1)
+		time.sleep(15)
 
 

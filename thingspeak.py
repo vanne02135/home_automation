@@ -10,10 +10,8 @@ def thingspeak_write(api_key, fields):
 	# raise exception on failed update
 	
 
-	fieldDict = {}
-	for i, f in enumerate(fields):
-		fieldDict["field" + str(i+1)] = str(f)
-	
+	fieldDict = fields
+
 	fieldDict["key"] = api_key
 
 	

@@ -62,17 +62,36 @@ if __name__ == "__main__":
 				print "%s inbound message: %s" % (now, msg)
 				deviceName = None
 				temperature = None
+				logline = ""
 				try:
 					[deviceName, temperature, battery] = parseLLAP(msg)
-					fields = [0]
+					fields = {}
 					if deviceName == "TA" and temperature:
-						fields[0] = temperature
+						fields["field1"] = temperature
 						logline = "%s %s %.3f" % (now, deviceName, temperature)
 						thingspeak.thingspeak_write(api_key, fields)
 					if deviceName == "TA" and battery:
-						fields[0] = battery
+						fields["field1"] = battery
 						logline = "%s %s %.3f" % (now, deviceName, battery)
 						thingspeak.thingspeak_write(api_key_battery, fields)
+					if deviceName == "TB" and temperature:
+						fields["field2"] = temperature
+						logline = "%s %s %.3f" % (now, deviceName, temperature)
+						thingspeak.thingspeak_write(api_key, fields)
+					if deviceName == "TB" and battery:
+						fields["field2"] = battery
+						logline = "%s %s %.3f" % (now, deviceName, battery)
+						thingspeak.thingspeak_write(api_key_battery, fields)
+					if deviceName == "TC" and temperature:
+						fields["field3"] = temperature
+						logline = "%s %s %.3f" % (now, deviceName, temperature)
+						thingspeak.thingspeak_write(api_key, fields)
+					if deviceName == "TC" and battery:
+						fields["field3"] = battery
+						logline = "%s %s %.3f" % (now, deviceName, battery)
+						thingspeak.thingspeak_write(api_key_battery, fields)
+						
+
 				except Exception as e:
 					logline = "%s %s" % (now, e)
 				open(outfile, "a").write(logline + "\n")

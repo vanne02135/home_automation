@@ -1,4 +1,6 @@
 
+// see also http://jsfiddle.net/GhEh9/
+
 var chart; 
 
 function drawChart() {

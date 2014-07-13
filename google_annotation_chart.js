@@ -19,29 +19,53 @@ function drawChart() {
 
     $.getJSON('https://api.thingspeak.com/channels/14421/feed.json?callback=?', function (data) {
 
-        var data2 = new google.visualization.DataTable();
-        data2.addColumn('date', 'Date');
-        data2.addColumn('number', 'yläkerta temp');
-        data2.addColumn('string', 'yläkerta annotation');
+        var data_field1 = new google.visualization.DataTable();
+        data_field1.addColumn('date', 'Date');
+        data_field1.addColumn('number', 'yläkerta temp');
+        data_field1.addColumn('string', 'yläkerta annotation');
 
-        var a = [];
-        var dt = [];
+        var data_field2 = new google.visualization.DataTable();
+        data_field2.addColumn('date', 'Date');
+        data_field2.addColumn('number', 'alakerta temp');
+        data_field2.addColumn('string', 'alakerta annotation');
+
+        var data_field3 = new google.visualization.DataTable();
+        data_field3.addColumn('date', 'Date');
+        data_field3.addColumn('number', 'ulko temp');
+        data_field3.addColumn('string', 'ulko annotation');
+
+        var currentFeed;
         for (var i = 0; i < data.feeds.length; i++) {
-            if (data.feeds[i].field1) {
-                a.push(parseFloat(data.feeds[i].field1));
-                dt.push(data.feeds[i].created_at);
+            currentFeed = data.feeds[i];
+            if (currentFeed.field1) {
+                data_field1.addRow([new Date(currentFeed.created_at), parseFloat(currentFeed.field1), undefined]);
+            }
+        }
+        for (var i = 0; i < data.feeds.length; i++) {
+            currentFeed = data.feeds[i];
+            if (currentFeed.field2) {
+                data_field2.addRow([new Date(currentFeed.created_at), parseFloat(currentFeed.field2), undefined]);
+            }
+        }
+        for (var i = 0; i < data.feeds.length; i++) {
+            currentFeed = data.feeds[i];
 
+            if (currentFeed.field3) {
+                data_field3.addRow([new Date(currentFeed.created_at), parseFloat(currentFeed.field3), undefined]);
             }
         }
 
-        for (var i = 0; i < dt.length; i++) {
-            data2.addRow([new Date(dt[i]), a[i], undefined]);
-        }
+    
 
-        chart.draw(data2, {
-            displayAnnotations: true,
-        });
-        chart.setVisibleChartRange(null, null);
+    var data2 = google.visualization.data.join(data_field1, data_field2, 'full', [
+        [0, 0]
+    ], [1, 2], [1, 2]);
+
+    chart.draw(data2, {
+        displayAnnotations: true,
+        interpolateNulls: true
+    });
+    chart.setVisibleChartRange(null, null);
 
     });
 }
